@@ -7,27 +7,51 @@ import java.util.Optional;
 import com.moonyboyvim.entity.ToDoEntity;
 
 public class ToDoRepository {
+  private class Tuple<T, E> {
+    private T first;
+    private E second;
+
+    public Tuple(T first, E second) {
+      this.first = first;
+      this.second = second;
+    }
+
+    public T getFirst() {
+      return first;
+    }
+
+    public E getSecond() {
+      return second;
+    }
+
+  }
+
   /* Title constants */
-  private final int MIN_TITLE_LENGTH = 10;
+  private final int MIN_TITLE_LENGTH = 5;
   private final int MAX_TITLE_LENGTH = 40;
   /* Description constants */
   private final int MIN_DESCRIPTION_LENGTH = 10;
   private final int MAX_DESCRIPTION_LENGTH = 100;
+  /* Local storage of todos */
   private List<ToDoEntity> listOfTodos = new ArrayList<>();
 
-  public List<ToDoEntity> getListOfTodo() {
-    return this.listOfTodos;
+  public void getListOfTodo() {
+    if (this.listOfTodos.equals(null) || this.listOfTodos.size() == 0)
+      System.out.println("Your list is empty now. Create your todo!");
+    this.listOfTodos.forEach(td -> System.out.println(td.getId() + ". " + td.getTitle()));
   }
 
-  public boolean createTodo(String title, String description) {
-    boolean res = this.validation(title, description);
-    if (!res) {
-      return false;
+  public void createTodo(String title, String description) {
+    Tuple<List<ToDoRepositoryError>, Boolean> tuple = this.validation(title, description);
+    if (!tuple.getSecond()) {
+      List<ToDoRepositoryError> list = tuple.getFirst();
+      for (ToDoRepositoryError tre : list)
+        System.out.println(tre.getTitle() + ": " + tre.getMessage());
     } else {
       ToDoEntity todo = new ToDoEntity(title, description);
       todo.setId(this.listOfTodos.size() + 1);
       this.listOfTodos.add(todo);
-      return true;
+      System.out.println("Todo added to list succesfully");
     }
   }
 
@@ -35,40 +59,56 @@ public class ToDoRepository {
     return this.listOfTodos.stream().filter(td -> td.getId() == id).findFirst();
   }
 
-  public boolean editTodoById(int id, String title, String description) {
+  public void editTodoById(int id, String title, String description) {
     Optional<ToDoEntity> td = this.getTodoById(id);
     if (td.get().equals(null)) {
-      return false;
+      System.out.println("Todo is not present in the list");
     } else {
-      boolean res = this.validation(title, description);
+      Tuple<List<ToDoRepositoryError>, Boolean> tuple = this.validation(title, description);
       ToDoEntity presentTodo = td.get();
-      if (!res) {
-        return false;
+      if (!tuple.getSecond()) {
+        List<ToDoRepositoryError> list = tuple.getFirst();
+        for (ToDoRepositoryError tre : list)
+          System.out.println(tre.getTitle() + ": " + tre.getMessage());
       } else {
         presentTodo.setTitle(title);
         presentTodo.setDescription(description);
-        return true;
+        System.out.println("Todo edited/updated succesfully");
       }
     }
   }
 
-  public boolean removeTodoById(int id) {
+  public void removeTodoById(int id) {
     Optional<ToDoEntity> td = this.getTodoById(id);
     if (td.get().equals(null)) {
-      return false;
+      System.out.println("Todo is not present in the list");
     } else {
       this.listOfTodos.remove(td.get());
-      return true;
+      System.out.println("Todo was removed succesfully from the list");
     }
   }
 
-  private boolean validation(String title, String description) {
+  private Tuple<List<ToDoRepositoryError>, Boolean> validation(String title, String description) {
+    String errTitle = "";
+    String errMessage = "";
+    boolean res = true;
+    List<ToDoRepositoryError> listOfErrors = new ArrayList<>();
     if (title.length() < MIN_TITLE_LENGTH || title.length() > MAX_TITLE_LENGTH) {
-      return false;
+      errTitle = "Invalid size of title";
+      errMessage = "Title cannot be less than " + MIN_DESCRIPTION_LENGTH + ", and greater than " +
+          MAX_DESCRIPTION_LENGTH;
+      res = false;
+      ToDoRepositoryError err = new ToDoRepositoryError(errTitle, errMessage);
+      listOfErrors.add(err);
     }
     if (description.length() < MIN_DESCRIPTION_LENGTH || description.length() > MAX_DESCRIPTION_LENGTH) {
-      return false;
+      errTitle = "Invalid size of description";
+      errMessage = "Description cannot be less than " + MIN_DESCRIPTION_LENGTH + " and greater than %s" +
+          MAX_DESCRIPTION_LENGTH;
+      res = false;
+      ToDoRepositoryError err = new ToDoRepositoryError(errTitle, errMessage);
+      listOfErrors.add(err);
     }
-    return true;
+    return new Tuple<List<ToDoRepositoryError>, Boolean>(listOfErrors, res);
   }
 }
