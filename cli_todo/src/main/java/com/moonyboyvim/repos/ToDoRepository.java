@@ -1,8 +1,11 @@
 package com.moonyboyvim.repos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import com.moonyboyvim.entity.ToDoEntity;
 
@@ -38,7 +41,8 @@ public class ToDoRepository {
   public void getListOfTodo() {
     if (this.listOfTodos.equals(null) || this.listOfTodos.size() == 0)
       System.out.println("Your list is empty now. Create your todo!");
-    this.listOfTodos.forEach(td -> System.out.println(td.getId() + ". " + td.getTitle()));
+    this.listOfTodos
+        .forEach(td -> System.out.println(td.getId() + ". " + td.getTitle() + " -> " + td.getStatusInString()));
   }
 
   public void createTodo(String title, String description) {
@@ -88,6 +92,42 @@ public class ToDoRepository {
     }
   }
 
+  public void setStatusTodoById(int id, String st) {
+    Map<String, Integer> status = new HashMap<>(Map.of("u", 0, "p", 1, "d", 2));
+    if (!status.containsKey(st)) {
+      System.out.println("Invalid input. Please try again...");
+    } else {
+      Optional<ToDoEntity> presentTodo = this.getTodoById(id);
+      if (presentTodo.get().equals(null)) {
+        System.out.println("This todo is not present in the list");
+      } else {
+        ToDoEntity todo = presentTodo.get();
+        Set<Map.Entry<String, Integer>> set = status.entrySet();
+
+        for (Map.Entry<String, Integer> el : set)
+          if (st.equals(el.getKey()))
+            todo.setStatus(el.getValue());
+
+        System.out.println("Todo status updated successfully");
+      }
+    }
+  }
+
+  public List<ToDoEntity> sortListByStatus(String st) {
+    Map<String, Integer> status = new HashMap<>(Map.of("u", 0, "p", 1, "d", 2));
+    if (!status.containsKey(st)) {
+      System.out.println("Invalid input. Please try again...");
+    }
+    List<ToDoEntity> listToDisplay = new ArrayList<>();
+    Set<Map.Entry<String, Integer>> set = status.entrySet();
+
+    for (Map.Entry<String, Integer> el : set)
+      if (st.equals(el.getKey()))
+        listToDisplay.add(this.listOfTodos.stream().filter(td -> td.getStatus() == el.getValue()).findFirst().get());
+
+    return listToDisplay;
+  }
+
   private Tuple<List<ToDoRepositoryError>, Boolean> validation(String title, String description) {
     String errTitle = "";
     String errMessage = "";
@@ -95,7 +135,7 @@ public class ToDoRepository {
     List<ToDoRepositoryError> listOfErrors = new ArrayList<>();
     if (title.length() < MIN_TITLE_LENGTH || title.length() > MAX_TITLE_LENGTH) {
       errTitle = "Invalid size of title";
-      errMessage = "Title cannot be less than " + MIN_DESCRIPTION_LENGTH + ", and greater than " +
+      errMessage = "Title cannot be less than " + MIN_DESCRIPTION_LENGTH + " and greater than " +
           MAX_DESCRIPTION_LENGTH;
       res = false;
       ToDoRepositoryError err = new ToDoRepositoryError(errTitle, errMessage);
@@ -103,7 +143,7 @@ public class ToDoRepository {
     }
     if (description.length() < MIN_DESCRIPTION_LENGTH || description.length() > MAX_DESCRIPTION_LENGTH) {
       errTitle = "Invalid size of description";
-      errMessage = "Description cannot be less than " + MIN_DESCRIPTION_LENGTH + " and greater than %s" +
+      errMessage = "Description cannot be less than " + MIN_DESCRIPTION_LENGTH + " and greater than " +
           MAX_DESCRIPTION_LENGTH;
       res = false;
       ToDoRepositoryError err = new ToDoRepositoryError(errTitle, errMessage);

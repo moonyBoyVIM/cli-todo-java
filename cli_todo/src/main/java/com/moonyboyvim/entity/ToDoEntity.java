@@ -4,11 +4,13 @@ public class ToDoEntity {
   private int id;
   private String title;
   private String description;
+  private int status;
 
   public ToDoEntity(String title, String description) {
     this.id = 0;
     this.title = title;
     this.description = description;
+    this.status = 0;
   }
 
   public String getTitle() {
@@ -35,4 +37,22 @@ public class ToDoEntity {
     this.id = id;
   }
 
+  public int getStatus() {
+    return status;
+  }
+
+  public void setStatus(int status) {
+    this.status = status;
+  }
+
+  public String getStatusInString() {
+    String statusString = "";
+    if (this.status == 0)
+      statusString = "Undone";
+    else if (this.status == 1)
+      statusString = "In progress";
+    else if (this.status == 2)
+      statusString = "Done";
+    return statusString;
+  }
 }

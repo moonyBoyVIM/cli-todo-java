@@ -1,5 +1,6 @@
 package com.moonyboyvim.controller;
 
+import java.util.List;
 import java.util.Scanner;
 
 import com.moonyboyvim.entity.ToDoEntity;
@@ -15,11 +16,12 @@ public class ToDoController {
   }
 
   public void start() {
+    boolean programStatus = true;
     System.out.println("*********************************************************");
     System.out.println("                      CLI-TODO                           ");
     System.out.println("*********************************************************");
     help();
-    for (;;) {
+    while (programStatus) {
       System.out.print("Enter your choice: ");
       int choice = scan.nextInt();
       scan.nextLine();
@@ -54,10 +56,28 @@ public class ToDoController {
           repos.editTodoById(idToEdit, editTitle, editDescription);
           break;
         case 5:
+          System.out.print("Enter the id of todo which you wanna to change status: ");
+          int idToStatus = scan.nextInt();
+          scan.nextLine();
+          System.out.print("Enter new status of todo: ");
+          String newStatus = scan.nextLine();
+          this.repos.setStatusTodoById(idToStatus, newStatus);
+          break;
+        case 6:
+          System.out.print("Enter the status of todo which you wanna to see ([d]one/in [p]rogress/[u]ndone): ");
+          String st = scan.nextLine();
+          this.displaySortedList(st);
+          break;
+        case 7:
           System.out.print("Enter the id of todo which need to delete: ");
           int idToDelete = scan.nextInt();
           scan.nextLine();
           repos.removeTodoById(idToDelete);
+          break;
+        case 8:
+          System.out.println("Bye-bye!!!");
+          programStatus = false;
+          break;
         default:
           System.out.println("Invalid input please try again");
           break;
@@ -72,7 +92,10 @@ public class ToDoController {
     System.out.println("* [2] - Create new todo                               *");
     System.out.println("* [3] - Get todo by id                                *");
     System.out.println("* [4] - Edit/Update todo by id                        *");
-    System.out.println("* [5] - Remove todo by id                             *");
+    System.out.println("* [5] - Change status of todo                         *");
+    System.out.println("* [6] - Sort list by status                           *");
+    System.out.println("* [7] - Remove todo by id                             *");
+    System.out.println("* [8] - Quit                                          *");
     System.out.println("*******************************************************");
   }
 
@@ -81,8 +104,14 @@ public class ToDoController {
     if (presentTodo.equals(null)) {
       System.out.println("This todo doesn't exist in the list");
     } else {
-      System.out.println(presentTodo.getId() + ": " + presentTodo.getTitle());
-      System.out.println(presentTodo.getDescription());
+      System.out.println(presentTodo.getId() + ". " + presentTodo.getTitle());
+      System.out.println("*\t" + presentTodo.getDescription());
     }
+  }
+
+  private void displaySortedList(String st) {
+    List<ToDoEntity> list = this.repos.sortListByStatus(st);
+    for (ToDoEntity el : list)
+      System.out.println(el.getId() + ". " + el.getTitle() + " -> " + el.getStatusInString());
   }
 }
