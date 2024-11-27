@@ -73,8 +73,7 @@ public class ToDoRepository {
     Tuple<List<ToDoRepositoryError>, Boolean> tuple = this.validation(title, description);
     if (!tuple.getSecond()) {
       List<ToDoRepositoryError> list = tuple.getFirst();
-      for (ToDoRepositoryError tre : list)
-        System.out.println(tre.getTitle() + ": " + tre.getMessage());
+      list.stream().forEach(err -> System.out.printf("%s: %s\n", err.getTitle(), err.getMessage()));
     } else {
       ToDoEntity todo = new ToDoEntity(title, description);
       todo.setId(this.listOfTodos.size() + 1);
@@ -118,8 +117,7 @@ public class ToDoRepository {
       ToDoEntity presentTodo = td.get();
       if (!tuple.getSecond()) {
         List<ToDoRepositoryError> list = tuple.getFirst();
-        for (ToDoRepositoryError tre : list)
-          System.out.println(tre.getTitle() + ": " + tre.getMessage());
+        list.stream().forEach(err -> System.out.printf("%s: %s\n", err.getTitle(), err.getMessage()));
       } else {
         presentTodo.setTitle(title);
         presentTodo.setDescription(description);
@@ -175,10 +173,10 @@ public class ToDoRepository {
         ToDoEntity todo = presentTodo.get();
         Set<Map.Entry<String, Integer>> set = status.entrySet();
 
-        for (Map.Entry<String, Integer> el : set)
+        set.stream().forEach(el -> {
           if (st.equals(el.getKey()))
             todo.setStatus(el.getValue());
-
+        });
         System.out.println("Todo status updated successfully");
       }
     }
