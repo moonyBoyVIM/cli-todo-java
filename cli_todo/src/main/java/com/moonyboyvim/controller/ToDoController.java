@@ -22,7 +22,7 @@ public class ToDoController {
     System.out.println("*********************************************************");
     help();
     while (programStatus) {
-      System.out.print("Enter your choice: ");
+      System.out.print("Enter your [ CHOICE ]: ");
       int choice = scan.nextInt();
       scan.nextLine();
       switch (choice) {
@@ -33,43 +33,43 @@ public class ToDoController {
           repos.getListOfTodo();
           break;
         case 2:
-          System.out.print("Enter the title of todo: ");
+          System.out.print("Enter the [ TITLE ] of todo: ");
           String title = scan.nextLine();
-          System.out.print("Enter the description of todo: ");
+          System.out.print("Enter the [ DESCRIPTION ] of todo: ");
           String description = scan.nextLine();
           repos.createTodo(title, description);
           break;
         case 3:
-          System.out.print("Enter the id of todo which you wanna see details: ");
+          System.out.print("Enter the [ ID ] of todo which you wanna see [ DETAILS ]: ");
           int id = scan.nextInt();
           scan.nextLine();
           this.getTodoByIdInfo(id);
           break;
         case 4:
-          System.out.print("Enter the id of todo which you edit/update: ");
+          System.out.print("Enter the [ ID ] of todo which you [ EDIT/UPDATE ]: ");
           int idToEdit = scan.nextInt();
           scan.nextLine();
-          System.out.print("Enter the new title of todo: ");
+          System.out.print("Enter the [ NEW TITLE ] of todo: ");
           String editTitle = scan.nextLine();
-          System.out.print("Enter the new description of todo: ");
+          System.out.print("Enter the [ NEW DESCRIPTION ] of todo: ");
           String editDescription = scan.nextLine();
           repos.editTodoById(idToEdit, editTitle, editDescription);
           break;
         case 5:
-          System.out.print("Enter the id of todo which you wanna to change status: ");
+          System.out.print("Enter the [ ID ] of todo which you wanna to [ CHANGE STATUS ]: ");
           int idToStatus = scan.nextInt();
           scan.nextLine();
-          System.out.print("Enter new status of todo: ");
+          System.out.print("Enter [ NEW STATUS ] of todo: ");
           String newStatus = scan.nextLine();
           this.repos.setStatusTodoById(idToStatus, newStatus);
           break;
         case 6:
-          System.out.print("Enter the status of todo which you wanna to see ([d]one/in [p]rogress/[u]ndone): ");
+          System.out.print("Enter the [ STATUS ] of todo which you wanna to see ([d]one/in [p]rogress/[u]ndone): ");
           String st = scan.nextLine();
           this.displaySortedList(st);
           break;
         case 7:
-          System.out.print("Enter the id of todo which need to delete: ");
+          System.out.print("Enter the [ ID ] of todo which need to [ DELETE ]: ");
           int idToDelete = scan.nextInt();
           scan.nextLine();
           repos.removeTodoById(idToDelete);
@@ -111,6 +111,8 @@ public class ToDoController {
 
   private void displaySortedList(String st) {
     List<ToDoEntity> list = this.repos.sortListByStatus(st);
+    if (list.equals(null) || list.size() == 0)
+      System.out.printf("List with value '%s' is empty\n", st);
     for (ToDoEntity el : list)
       System.out.println(el.getId() + ". " + el.getTitle() + " -> " + el.getStatusInString());
   }

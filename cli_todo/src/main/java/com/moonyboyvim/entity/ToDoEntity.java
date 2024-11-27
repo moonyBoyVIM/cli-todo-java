@@ -1,5 +1,9 @@
 package com.moonyboyvim.entity;
 
+/**
+ * Class of Todo entity which reporesents
+ * main properties of this entity
+ */
 public class ToDoEntity {
   private int id;
   private String title;
@@ -45,6 +49,11 @@ public class ToDoEntity {
     this.status = status;
   }
 
+  /**
+   * This method return a String object
+   * which represents digital value of
+   * todo status
+   */
   public String getStatusInString() {
     String statusString = "";
     if (this.status == 0)
